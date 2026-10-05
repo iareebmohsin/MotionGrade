@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
-import { Upload, Film, Check, Camera } from "lucide-react";
+import { UploadCloud, Film, Check, Video } from "lucide-react";
 
 const GROUPS = [
   { id: "legs", label: "Legs" },
@@ -14,11 +14,11 @@ type GroupId = (typeof GROUPS)[number]["id"];
 
 type CameraView = "side" | "front" | "any" | "none";
 
-const CAMERA_BADGE: Record<CameraView, string | null> = {
-  side:  "Side view",
+const CAMERA_HINT: Record<CameraView, string | null> = {
+  side: "Side view",
   front: "Front view",
-  any:   "Any angle",
-  none:  null,
+  any: "Any angle",
+  none: null,
 };
 
 const EXERCISES_BY_GROUP: Record<
@@ -26,24 +26,24 @@ const EXERCISES_BY_GROUP: Record<
   { id: string; label: string; supported: boolean; cameraView: CameraView }[]
 > = {
   legs: [
-    { id: "squat",             label: "Squat",             supported: true, cameraView: "side" },
-    { id: "lunge",             label: "Lunge",             supported: true, cameraView: "side" },
+    { id: "squat", label: "Squat", supported: true, cameraView: "side" },
+    { id: "lunge", label: "Lunge", supported: true, cameraView: "side" },
     { id: "romanian_deadlift", label: "Romanian Deadlift", supported: true, cameraView: "side" },
   ],
   chest: [
-    { id: "push_up",           label: "Push Up",           supported: true, cameraView: "side" },
-    { id: "bench_press",       label: "Bench Press",       supported: true, cameraView: "any" },
+    { id: "push_up", label: "Push Up", supported: true, cameraView: "side" },
+    { id: "bench_press", label: "Bench Press", supported: true, cameraView: "any" },
     { id: "incline_bench_press", label: "Incline Bench Press", supported: true, cameraView: "side" },
   ],
   shoulders: [
     { id: "overhead_press", label: "Overhead Press", supported: true, cameraView: "any" },
-    { id: "lateral_raise",  label: "Lateral Raise",  supported: true, cameraView: "any" },
-    { id: "upright_row",    label: "Upright Row",    supported: true, cameraView: "front" },
+    { id: "lateral_raise", label: "Lateral Raise", supported: true, cameraView: "any" },
+    { id: "upright_row", label: "Upright Row", supported: true, cameraView: "front" },
   ],
   back: [
-    { id: "pull_up",     label: "Pull Up",     supported: true, cameraView: "any" },
+    { id: "pull_up", label: "Pull Up", supported: true, cameraView: "any" },
     { id: "barbell_row", label: "Barbell Row", supported: true, cameraView: "side" },
-    { id: "deadlift",    label: "Deadlift",    supported: true, cameraView: "side" },
+    { id: "deadlift", label: "Deadlift", supported: true, cameraView: "side" },
   ],
 };
 
@@ -83,83 +83,86 @@ export function UploadZone({ onAnalyze, loading }: Props) {
     if (file && !loading) onAnalyze(file, exerciseId);
   };
 
-  return (
-    <div className="space-y-5">
-      {/* Drop zone */}
-      <div
-        onClick={() => inputRef.current?.click()}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={handleDrop}
-        className={[
-          "relative cursor-pointer rounded-2xl border-2 border-dashed py-7 px-8",
-          "transition-all duration-300 flex flex-col items-center justify-center gap-3",
-          dragging
-            ? "border-green-400 bg-green-500/10 animate-glow-pulse"
-            : file
-            ? "border-green-500/50 bg-green-500/5"
-            : "border-white/15 bg-white/[0.03] hover:border-green-500/40 hover:bg-green-500/5 animate-border-pulse",
-        ].join(" ")}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="video/mp4,video/quicktime,video/avi,video/x-matroska"
-          className="hidden"
-          onChange={handleFileChange}
-        />
+  const ready = Boolean(file && exerciseId && !loading);
 
-        {file ? (
-          <>
-            <Film className="w-12 h-12 text-green-400" />
-            <div className="text-center">
-              <p className="text-green-400 font-semibold break-all leading-snug">
-                {file.name}
-              </p>
-              <p className="text-white/40 text-sm mt-1">
-                {(file.size / 1024 / 1024).toFixed(1)} MB
-              </p>
-            </div>
-            <button
-              className="px-4 py-1.5 rounded-lg text-sm text-white/35 border border-white/10 hover:text-red-400/80 hover:border-red-500/25 hover:bg-red-500/5 transition-all duration-200"
-              onClick={(e) => { e.stopPropagation(); setFile(null); }}
-            >
-              Remove
-            </button>
-          </>
-        ) : (
-          <>
-            <Upload className="w-12 h-12 text-white/30" />
-            <div className="text-center">
-              <p className="text-white/75 font-semibold text-lg">
-                Drop your video here
-              </p>
-              <p className="text-white/40 text-sm mt-1">or click to browse</p>
-              <div className="mt-2 flex flex-col gap-0.5">
-                <p className="text-white/25 text-xs">MP4 · MOV · AVI</p>
-                <p className="text-white/25 text-xs">Max 500 MB</p>
+  return (
+    <div className="space-y-6">
+      {/* Step 1: clip */}
+      <div>
+        <p className="eyebrow mb-3">1 · Clip</p>
+        <div
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          className={[
+            "relative cursor-pointer rounded-xl border border-dashed py-7 px-6",
+            "transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center",
+            dragging
+              ? "border-accent bg-accent/10 animate-glow-pulse"
+              : file
+              ? "border-accent/50 bg-accent/[0.05]"
+              : "border-white/15 bg-[#0d0d0d] hover:border-accent/40 hover:bg-accent/[0.04] animate-border-pulse",
+          ].join(" ")}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="video/mp4,video/quicktime,video/avi,video/x-matroska"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {file ? (
+            <>
+              <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Film className="w-6 h-6 text-accent" />
               </div>
-            </div>
-          </>
-        )}
+              <div>
+                <p className="text-white/90 font-medium break-all leading-snug">{file.name}</p>
+                <p className="text-white/40 text-xs mt-1">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+              </div>
+              <button
+                className="btn-ghost px-3 py-1 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFile(null);
+                }}
+              >
+                Choose another
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                <UploadCloud className="w-6 h-6 text-white/50" />
+              </div>
+              <div>
+                <p className="text-white/85 font-medium">Drop a video or click to browse</p>
+                <p className="text-white/35 text-xs mt-1">MP4, MOV or AVI · up to 500 MB</p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Exercise selector */}
-      <div className="glass-card p-5 space-y-4">
-        <p className="text-white/40 text-sm uppercase tracking-widest font-medium">
-          Exercise
-        </p>
+      {/* Step 2: lift */}
+      <div>
+        <p className="eyebrow mb-3">2 · Lift</p>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-1 p-1 rounded-lg bg-[#0d0d0d] border border-white/[0.06] mb-3">
           {GROUPS.map((g) => (
             <button
               key={g.id}
               onClick={() => handleGroupChange(g.id)}
               className={[
-                "py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                "py-2 rounded-md text-sm font-medium transition-all duration-200",
                 selectedGroup === g.id
-                  ? "bg-green-500/20 text-green-400 border border-green-500/40"
-                  : "bg-white/[0.04] text-white/50 border border-white/10 hover:border-white/20 hover:text-white/70",
+                  ? "bg-white/[0.08] text-white shadow-sm"
+                  : "text-white/45 hover:text-white/80",
               ].join(" ")}
             >
               {g.label}
@@ -167,49 +170,46 @@ export function UploadZone({ onAnalyze, loading }: Props) {
           ))}
         </div>
 
-        <div className="space-y-1">
-          {EXERCISES_BY_GROUP[selectedGroup].map((ex) => (
-            <button
-              key={ex.id}
-              onClick={() => handleExerciseSelect(ex.id, ex.supported)}
-              disabled={!ex.supported}
-              className={[
-                "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all duration-200 text-left",
-                exerciseId === ex.id && ex.supported
-                  ? "bg-green-500/15 text-green-400 border border-green-500/30"
-                  : ex.supported
-                  ? "text-white/70 hover:bg-white/[0.05] hover:text-white border border-transparent"
-                  : "text-white/25 cursor-not-allowed border border-transparent",
-              ].join(" ")}
-            >
-              <span>{ex.label}</span>
-              {exerciseId === ex.id && ex.supported ? (
-                <Check key="check" className="w-4 h-4 text-green-400 shrink-0 animate-fade-in" style={{ animationDuration: "0.35s", animationFillMode: "both" }} />
-              ) : !ex.supported ? (
-                <span className="text-xs text-white/20">Soon</span>
-              ) : CAMERA_BADGE[ex.cameraView] ? (
-                <span className="flex items-center gap-1 text-xs text-white/25 shrink-0">
-                  <Camera className="w-3 h-3" />
-                  {CAMERA_BADGE[ex.cameraView]}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {EXERCISES_BY_GROUP[selectedGroup].map((ex) => {
+            const active = exerciseId === ex.id && ex.supported;
+            return (
+              <button
+                key={ex.id}
+                onClick={() => handleExerciseSelect(ex.id, ex.supported)}
+                disabled={!ex.supported}
+                className={[
+                  "flex flex-col items-start gap-1.5 rounded-lg border px-3.5 py-3 text-left transition-all duration-200",
+                  active
+                    ? "border-accent/50 bg-accent/[0.08]"
+                    : ex.supported
+                    ? "border-white/[0.06] bg-[#0d0d0d] hover:border-white/20"
+                    : "border-white/[0.04] bg-transparent cursor-not-allowed opacity-40",
+                ].join(" ")}
+              >
+                <span className="flex items-center justify-between w-full">
+                  <span className={`text-sm font-medium ${active ? "text-accent" : "text-white/80"}`}>
+                    {ex.label}
+                  </span>
+                  {active && <Check className="w-4 h-4 text-accent shrink-0" />}
                 </span>
-              ) : null}
-            </button>
-          ))}
+                {!ex.supported ? (
+                  <span className="text-[11px] text-white/30">Coming soon</span>
+                ) : CAMERA_HINT[ex.cameraView] ? (
+                  <span className="flex items-center gap-1 text-[11px] text-white/35">
+                    <Video className="w-3 h-3" />
+                    {CAMERA_HINT[ex.cameraView]}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Analyze button */}
-      <button
-        onClick={handleSubmit}
-        disabled={!file || !exerciseId || loading}
-        className={[
-          "w-full py-4 rounded-2xl font-semibold text-base transition-all duration-300",
-          file && exerciseId && !loading
-            ? "bg-green-500 hover:bg-green-400 text-black shadow-[0_0_20px_rgba(34,197,94,0.25)] hover:shadow-[0_0_35px_rgba(34,197,94,0.4)] active:scale-[0.98]"
-            : "bg-white/[0.05] text-white/25 cursor-not-allowed",
-        ].join(" ")}
-      >
-        Analyze Form
+      {/* Submit */}
+      <button onClick={handleSubmit} disabled={!ready} className="btn-primary w-full py-3.5 text-base">
+        Grade my form
       </button>
     </div>
   );

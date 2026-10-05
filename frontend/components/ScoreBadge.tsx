@@ -1,35 +1,52 @@
-import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { ShieldCheck, AlertTriangle, ShieldAlert } from "lucide-react";
 import type { OverallScore } from "@/types/analysis";
 
 const CONFIG: Record<
   OverallScore,
   {
     label: string;
+    hint: string;
+    bars: number;
     Icon: React.ComponentType<{ className?: string }>;
-    className: string;
-    iconClass: string;
+    text: string;
+    fill: string;
+    iconBox: string;
+    border: string;
+    chip: string;
   }
 > = {
   good: {
-    label: "Good",
-    Icon: CheckCircle2,
-    className:
-      "text-green-400 border-green-500/40 bg-green-500/10 shadow-[0_0_50px_rgba(34,197,94,0.2)]",
-    iconClass: "text-green-400",
+    label: "Solid form",
+    hint: "Keep doing what you are doing.",
+    bars: 3,
+    Icon: ShieldCheck,
+    text: "text-emerald-300",
+    fill: "bg-emerald-400",
+    iconBox: "bg-emerald-400/10",
+    border: "border-emerald-400/30",
+    chip: "bg-emerald-400/10 border-emerald-400/30 text-emerald-300",
   },
   needs_improvement: {
-    label: "Needs Improvement",
+    label: "Room to improve",
+    hint: "One or two things to work on next session.",
+    bars: 2,
     Icon: AlertTriangle,
-    className:
-      "text-yellow-400 border-yellow-500/40 bg-yellow-500/10 shadow-[0_0_50px_rgba(234,179,8,0.15)]",
-    iconClass: "text-yellow-400",
+    text: "text-amber-300",
+    fill: "bg-amber-400",
+    iconBox: "bg-amber-400/10",
+    border: "border-amber-400/30",
+    chip: "bg-amber-400/10 border-amber-400/30 text-amber-300",
   },
   poor: {
-    label: "Poor",
-    Icon: XCircle,
-    className:
-      "text-red-400 border-red-500/40 bg-red-500/10 shadow-[0_0_50px_rgba(239,68,68,0.15)]",
-    iconClass: "text-red-400",
+    label: "Needs work",
+    hint: "Drop the weight and rebuild the pattern.",
+    bars: 1,
+    Icon: ShieldAlert,
+    text: "text-rose-300",
+    fill: "bg-rose-400",
+    iconBox: "bg-rose-400/10",
+    border: "border-rose-400/30",
+    chip: "bg-rose-400/10 border-rose-400/30 text-rose-300",
   },
 };
 
@@ -42,24 +59,36 @@ export function ScoreBadge({
   compact?: boolean;
   delay?: number;
 }) {
-  const { label, Icon, className, iconClass } = CONFIG[score];
+  const c = CONFIG[score];
+  const { Icon } = c;
 
   if (compact) {
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold ${className}`}>
-        <Icon className={`w-3.5 h-3.5 ${iconClass}`} />
-        {label}
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-semibold ${c.chip}`}>
+        <Icon className="w-3.5 h-3.5" />
+        {c.label}
       </span>
     );
   }
 
   return (
     <div
-      className={`animate-score-reveal border-2 rounded-2xl px-6 py-6 text-center ${className}`}
+      className={`animate-score-reveal panel p-5 flex items-center gap-4 ${c.border}`}
       style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}
     >
-      <Icon className={`w-12 h-12 mx-auto mb-3 ${iconClass}`} />
-      <div className="text-xl font-bold tracking-wide">{label}</div>
+      <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${c.iconBox}`}>
+        <Icon className={`w-6 h-6 ${c.text}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-white/35 text-[0.7rem] uppercase tracking-[0.2em] font-semibold">Overall grade</p>
+        <p className={`text-xl font-semibold ${c.text}`}>{c.label}</p>
+        <p className="text-white/40 text-xs mt-0.5">{c.hint}</p>
+      </div>
+      <div className="flex gap-1 shrink-0">
+        {[0, 1, 2].map((i) => (
+          <span key={i} className={`w-2 h-8 rounded-full ${i < c.bars ? c.fill : "bg-white/10"}`} />
+        ))}
+      </div>
     </div>
   );
 }

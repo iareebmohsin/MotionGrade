@@ -6,36 +6,25 @@ export function LoadingOverlay({ progress }: Props) {
   const displayProgress = Math.round(Math.min(100, Math.max(0, progress)));
 
   return (
-    <div className="flex flex-col items-center justify-center gap-8 py-10">
-      {/* Double spinner */}
-      <div className="relative w-20 h-20">
-        <div className="absolute inset-0 rounded-full border-[3px] border-green-500/20 border-t-green-500 animate-spin" />
-        <div
-          className="absolute inset-2.5 rounded-full border-[3px] border-green-400/15 border-b-green-400 animate-spin"
-          style={{ animationDirection: "reverse", animationDuration: "0.75s" }}
-        />
-        {/* Centered percentage inside spinner */}
+    <div className="flex flex-col items-center gap-7 py-6">
+      <div className="relative w-full aspect-[16/7] rounded-lg bg-[#0d0d0d] border border-white/[0.06] overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute left-0 right-0 h-px bg-accent/70 shadow-[0_0_14px_rgba(229,247,90,0.9)] animate-scan" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-green-400 font-mono font-semibold text-base leading-none">
-            {displayProgress}%
-          </span>
+          <span className="font-mono text-4xl font-semibold text-accent tabular-nums">{displayProgress}%</span>
         </div>
       </div>
 
-      {/* Text */}
       <div className="text-center">
-        <p className="text-white/80 font-medium text-lg">Analyzing your form…</p>
-        <p className="text-white/35 text-sm mt-1">This may take a moment</p>
+        <p className="text-white/85 font-medium">Tracking joints frame by frame…</p>
+        <p className="text-white/35 text-sm mt-1">Longer clips take longer</p>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full">
-        <div className="w-full bg-white/[0.07] rounded-full h-1.5 overflow-hidden">
-          <div
-            className="h-full bg-green-500 rounded-full transition-all duration-700 ease-out"
-            style={{ width: `${displayProgress}%` }}
-          />
-        </div>
+      <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div
+          className="h-full rounded-full bg-accent transition-all duration-700 ease-out"
+          style={{ width: `${displayProgress}%` }}
+        />
       </div>
     </div>
   );

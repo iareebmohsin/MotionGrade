@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import localFont from "next/font/local";
-import { ConstellationBg } from "@/components/ConstellationBg";
+import { Backdrop } from "@/components/Backdrop";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+const jakarta = localFont({
+  src: "./fonts/PlusJakartaSans.woff2",
+  variable: "--font-sans",
+  weight: "300 800",
   display: "swap",
 });
 const geistMono = localFont({
@@ -16,8 +16,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "LiftLens",
-  description: "Upload your workout video and get instant AI-powered form feedback.",
+  title: "MotionGrade",
+  description: "Computer-vision coaching that grades every rep of your lift.",
 };
 
 export default function RootLayout({
@@ -27,10 +27,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} ${geistMono.variable} antialiased`}
-      >
-        <ConstellationBg />
+      <body className={`${jakarta.variable} ${geistMono.variable} antialiased`}>
+        <Backdrop />
         {children}
       </body>
     </html>

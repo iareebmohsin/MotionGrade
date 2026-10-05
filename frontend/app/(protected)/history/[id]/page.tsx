@@ -1,29 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 import { getAnalysisById, deleteAnalysis, skeletonVideoUrl } from "@/lib/api";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { FeedbackList } from "@/components/FeedbackList";
 import { CameraErrorCard } from "@/components/CameraErrorCard";
 import type { Analysis } from "@/types/analysis";
 
-// Slides element in from bottom; animationDelay in ms from page load
-function In({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
+function In({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   return (
-    <div
-      className={`animate-slide-up ${className}`}
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <div className={`animate-slide-up ${className}`} style={{ animationDelay: `${delay}ms`, animationFillMode: "both" }}>
       {children}
     </div>
   );
@@ -53,26 +42,18 @@ function DeleteModal({
         onClick={close}
       />
       <div
-        className={`relative glass-card p-6 w-full max-w-sm ${closing ? "animate-slide-down-out" : "animate-slide-up"}`}
+        className={`relative panel p-6 w-full max-w-sm ${closing ? "animate-slide-down-out" : "animate-slide-up"}`}
         style={{ animationFillMode: "both" }}
       >
-        <h3 className="text-white font-semibold text-lg mb-2">Delete analysis?</h3>
+        <h3 className="text-white font-semibold text-lg mb-2">Delete this session?</h3>
         <p className="text-white/45 text-sm mb-6">
-          This action cannot be undone. The analysis and its skeleton video will be permanently removed.
+          The report and its tracked video will be permanently removed. This cannot be undone.
         </p>
         <div className="flex gap-3">
-          <button
-            onClick={close}
-            disabled={deleting}
-            className="flex-1 py-2.5 rounded-xl border border-white/10 text-white/55 hover:text-white/80 hover:border-white/20 transition-colors text-sm"
-          >
+          <button onClick={close} disabled={deleting} className="btn-ghost flex-1 py-2.5 text-sm">
             Cancel
           </button>
-          <button
-            onClick={onConfirm}
-            disabled={deleting}
-            className="flex-1 py-2.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 hover:border-red-500/50 disabled:opacity-50 transition-colors text-sm font-medium"
-          >
+          <button onClick={onConfirm} disabled={deleting} className="btn-danger flex-1 py-2.5 text-sm font-medium">
             {deleting ? "Deleting…" : "Delete"}
           </button>
         </div>
@@ -109,19 +90,18 @@ export default function AnalysisDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-72px)] text-white/30 text-sm animate-pulse">
-        Loading…
-      </div>
+      <div className="flex items-center justify-center h-[calc(100vh-64px)] text-white/30 text-sm animate-pulse">Loading…</div>
     );
   }
 
   if (!analysis) {
     return (
-      <div
-        className="flex flex-col items-center justify-center h-[calc(100vh-72px)] gap-2 animate-fade-in"
-        style={{ animationFillMode: "both" }}
-      >
-        <p className="text-white/40 text-sm">Analysis not found.</p>
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-3 animate-fade-in" style={{ animationFillMode: "both" }}>
+        <p className="text-white/40 text-sm">That session does not exist.</p>
+        <Link href="/history" className="btn-ghost px-4 py-2 text-sm">
+          <ArrowLeft className="w-4 h-4" />
+          Back to sessions
+        </Link>
       </div>
     );
   }
@@ -137,95 +117,73 @@ export default function AnalysisDetailPage() {
   }
 
   const n = analysis.feedbackItems.length;
-  // Animation timeline (ms from page load):
-  // 0              — ScoreBadge (score-reveal ~550ms)
-  // 320            — Feedback card slides in; items inside appear at 320 + i*150
-  // 320 + n*150 + 180 — meta bar
-  // 320 + n*150 + 320 — delete button
-  // 320 + n*150 + 500 — video (right column, after all left items)
   const feedbackDelay = 320;
-  const metaDelay = feedbackDelay + n * 150 + 180;
-  const deleteDelay = feedbackDelay + n * 150 + 320;
-  const videoDelay = feedbackDelay + n * 150 + 500;
+  const deleteDelay = feedbackDelay + n * 150 + 200;
 
   return (
     <>
-      {showModal && (
-        <DeleteModal
-          onConfirm={handleDelete}
-          onCancel={() => setShowModal(false)}
-          deleting={deleting}
-        />
-      )}
+      {showModal && <DeleteModal onConfirm={handleDelete} onCancel={() => setShowModal(false)} deleting={deleting} />}
 
-      <div className="relative mx-auto max-w-5xl px-4 h-[calc(100vh-72px)] flex flex-col py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0">
+      <div className="relative mx-auto max-w-6xl px-6 sm:px-10 h-[calc(100vh-64px)] flex flex-col py-6">
+        <div className="flex flex-wrap items-end justify-between gap-3 mb-5 animate-fade-in">
+          <div>
+            <Link href="/history" className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/80 text-xs mb-2 transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Sessions
+            </Link>
+            <h1 className="text-2xl font-semibold text-white tracking-tight capitalize">
+              {analysis.exerciseId.replace(/_/g, " ")}
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="chip capitalize">{analysis.muscleGroup}</span>
+            <span className="chip">{new Date(analysis.createdAt).toLocaleString()}</span>
+          </div>
+        </div>
 
-          {/* ── Left column ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-5 flex-1 min-h-0">
+          <In delay={100} className="flex flex-col min-h-0">
+            {analysis.skeletonVideoPath ? (
+              <div className="panel p-4 flex flex-col flex-1 min-h-0">
+                <p className="eyebrow mb-3 shrink-0">Joint tracking</p>
+                <video
+                  src={skeletonVideoUrl(analysis.id)}
+                  controls
+                  playsInline
+                  className="flex-1 min-h-0 w-full rounded-lg bg-black"
+                  onLoadedMetadata={(e) => {
+                    e.currentTarget.currentTime = 0.04;
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="panel p-5 flex-1 flex items-center justify-center">
+                <span className="text-white/25 text-sm">No tracked video for this session</span>
+              </div>
+            )}
+          </In>
+
           <div className="flex flex-col gap-4 min-h-0">
+            <ScoreBadge score={analysis.overallScore} delay={200} />
 
-            {/* ScoreBadge is OUTSIDE the scroll container so its box-shadow is never clipped */}
-            <ScoreBadge score={analysis.overallScore} delay={0} />
-
-            {/* Scrollable: feedback + meta + delete */}
-            <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide flex-1 pr-1">
-
+            <div className="flex flex-col gap-4 overflow-y-auto scrollbar-hide flex-1 min-h-0">
               {n > 0 && (
                 <In delay={feedbackDelay}>
-                  <div className="glass-card p-5">
-                    <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-4">
-                      Feedback
-                    </h2>
-                    {/* baseDelay = feedbackDelay so items start at feedbackDelay + i*150 */}
+                  <div className="panel p-5">
+                    <p className="eyebrow mb-4">What we saw</p>
                     <FeedbackList items={analysis.feedbackItems} baseDelay={feedbackDelay} />
                   </div>
                 </In>
               )}
 
-              <In delay={metaDelay}>
-                <div className="glass-card px-5 py-3.5 grid grid-cols-3 text-sm text-white/35">
-                  <span className="capitalize">{analysis.exerciseId.replace(/_/g, " ")}</span>
-                  <span className="capitalize text-center">{analysis.muscleGroup}</span>
-                  <span className="text-right">{new Date(analysis.createdAt).toLocaleString()}</span>
-                </div>
-              </In>
-
               <In delay={deleteDelay}>
-                <button
-                  onClick={() => setShowModal(true)}
-                  disabled={deleting}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400/70 hover:text-red-400 hover:bg-red-500/15 hover:border-red-500/35 disabled:opacity-40 transition-colors"
-                >
+                <button onClick={() => setShowModal(true)} disabled={deleting} className="btn-danger w-full py-3 text-sm">
                   <Trash2 className="w-4 h-4" />
-                  <span className="font-medium">Delete analysis</span>
+                  Delete session
                 </button>
               </In>
-
             </div>
           </div>
-
-          {/* ── Right column: video appears after left side is done ── */}
-          <In delay={videoDelay} className="flex flex-col min-h-0">
-            {analysis.skeletonVideoPath ? (
-              <div className="glass-card p-5 flex flex-col flex-1 min-h-0">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-4 shrink-0">
-                  Skeleton Analysis
-                </h2>
-                <video
-                  src={skeletonVideoUrl(analysis.id)}
-                  controls
-                  playsInline
-                  className="flex-1 min-h-0 w-full rounded-xl bg-black"
-                  onLoadedMetadata={(e) => { e.currentTarget.currentTime = 0.04; }}
-                />
-              </div>
-            ) : (
-              <div className="glass-card p-5 flex-1 flex items-center justify-center">
-                <span className="text-white/20 text-sm">No skeleton video available</span>
-              </div>
-            )}
-          </In>
-
         </div>
       </div>
     </>

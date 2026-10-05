@@ -3,23 +3,85 @@
 @tailwind utilities;
 
 :root {
-  --background: #070b0f;
-  --foreground: #f0f0f0;
+  --background: #0a0a0a;
+  --foreground: #ececec;
 }
 
 html {
-  font-size: 17px;
+  font-size: 16px;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-inter), system-ui, Arial, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Keep Chrome autofill from painting inputs white */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #151515 inset;
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
 @layer components {
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl;
+  .panel {
+    @apply bg-surface border border-white/[0.08] rounded-2xl;
+  }
+
+  .panel-raised {
+    @apply bg-raised border border-white/[0.08] rounded-xl;
+  }
+
+  .tag {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/70;
+  }
+
+  .eyebrow {
+    @apply text-white/45 text-[0.7rem] font-semibold uppercase tracking-[0.2em];
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent text-[#111] font-semibold transition-all duration-200 hover:bg-accent-hover hover:shadow-[0_8px_30px_rgba(229,247,90,0.25)] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/35 hover:bg-white/[0.04] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .field {
+    @apply w-full rounded-xl bg-[#151515] border border-white/10 px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/10 transition-colors;
+  }
+
+  .field-error {
+    @apply border-rose-500/60 focus:border-rose-500/70 focus:ring-rose-500/15;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full bg-white/[0.05] border border-white/[0.08] px-2.5 py-1 text-xs text-white/60;
+  }
+
+  .nav-pill {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm transition-all duration-200;
+  }
+
+  .nav-pill-active {
+    @apply border border-white/20 bg-white/[0.05] text-white;
+  }
+
+  .nav-pill-idle {
+    @apply border border-transparent text-white/60 hover:text-white hover:bg-white/[0.04];
   }
 }
 

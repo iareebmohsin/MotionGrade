@@ -3,28 +3,17 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Dumbbell, Zap, Brain, BarChart3 } from "lucide-react";
+import { ArrowRight, Dumbbell, ScanLine, HardDrive } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { isAuthenticated } from "@/lib/auth";
 
-const features = [
-  {
-    icon: Brain,
-    title: "12 exercises",
-    desc: "Squat, deadlift, bench press, pull-up, row & more",
-  },
-  {
-    icon: Zap,
-    title: "Pose estimation",
-    desc: "Skeleton overlay rendered frame-by-frame on your video",
-  },
-  {
-    icon: BarChart3,
-    title: "Per-aspect scoring",
-    desc: "Depth, back angle, bar path and other key metrics graded",
-  },
+const FACTS = [
+  { Icon: Dumbbell, value: "12", label: "lifts graded" },
+  { Icon: ScanLine, value: "33", label: "joints tracked" },
+  { Icon: HardDrive, value: "Local", label: "videos stay here" },
 ];
 
-export default function LandingPage() {
+export default function EntryPage() {
   const router = useRouter();
 
   useEffect(() => {
@@ -32,79 +21,51 @@ export default function LandingPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#070b0f]">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_90%_55%_at_50%_-5%,rgba(34,197,94,0.15),transparent)]" />
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_40%_30%_at_80%_80%,rgba(34,197,94,0.04),transparent)]" />
-
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-4 text-center">
-        {/* Pulsing badge */}
-        <div
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium mb-8 animate-fade-in"
-          style={{ animationFillMode: "both" }}
-        >
-          <span className="relative flex w-2 h-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
-            <span className="relative inline-flex rounded-full w-2 h-2 bg-green-400" />
-          </span>
-          AI-powered form analysis
+    <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
+      <div
+        className="w-full max-w-md panel rounded-[28px] p-7 sm:p-9 animate-slide-up"
+        style={{ animationFillMode: "both" }}
+      >
+        <div className="flex items-center justify-between">
+          <Logo />
+          <span className="chip">Self-hosted</span>
         </div>
 
-        {/* Logo + title */}
-        <div
-          className="inline-flex items-center gap-4 mb-5 animate-fade-in"
-          style={{ animationDelay: "80ms", animationFillMode: "both" }}
-        >
-          <Dumbbell className="w-12 h-12 text-green-500" />
-          <h1 className="text-6xl sm:text-7xl font-bold text-white tracking-tight">
-            LiftLens
-          </h1>
-        </div>
-
-        {/* Tagline */}
-        <p
-          className="text-white/50 text-lg sm:text-xl mb-12 max-w-md leading-relaxed animate-fade-in"
-          style={{ animationDelay: "160ms", animationFillMode: "both" }}
-        >
-          Upload your workout video and get detailed form feedback powered by computer vision.
+        <span className="tag mt-9">Form analysis</span>
+        <h1 className="mt-4 text-3xl sm:text-[2.35rem] font-medium text-white leading-[1.12]">
+          Grade your lifts
+          <br />
+          <span className="text-cream">from a phone clip.</span>
+        </h1>
+        <p className="mt-3 text-white/50 text-sm leading-relaxed">
+          Upload a set, pick the lift, and get a per-aspect grade with a joint-tracked video and notes
+          on what to fix.
         </p>
 
-        {/* Feature cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12 max-w-3xl w-full">
-          {features.map(({ icon: Icon, title, desc }, i) => (
+        <div className="mt-7 grid grid-cols-3 gap-2">
+          {FACTS.map(({ Icon, value, label }, i) => (
             <div
-              key={title}
-              className="bg-white/5 border border-transparent hover:border-green-500/25 rounded-2xl px-5 py-5 text-left transition-all duration-300 hover:scale-[1.03] hover:bg-white/[0.07] animate-fade-in cursor-default"
-              style={{
-                animationDelay: `${240 + i * 120}ms`,
-                animationFillMode: "both",
-              }}
+              key={label}
+              className="panel-raised px-3 py-3 animate-fade-in"
+              style={{ animationDelay: `${160 + i * 80}ms`, animationFillMode: "both" }}
             >
-              <Icon className="w-6 h-6 text-green-500 mb-3" />
-              <p className="text-white/85 text-sm font-semibold mb-1.5">{title}</p>
-              <p className="text-white/40 text-sm leading-relaxed">{desc}</p>
+              <Icon className="w-4 h-4 text-accent mb-2" />
+              <p className="text-white font-semibold leading-none">{value}</p>
+              <p className="text-white/40 text-[11px] mt-1">{label}</p>
             </div>
           ))}
         </div>
 
-        {/* CTAs */}
-        <div
-          className="flex items-center gap-4 animate-fade-in"
-          style={{ animationDelay: "600ms", animationFillMode: "both" }}
-        >
-          <Link
-            href="/register"
-            className="px-8 py-4 rounded-xl bg-green-500 hover:bg-green-400 active:scale-[0.97] hover:scale-[1.02] text-black font-bold text-base transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/35"
-          >
-            Get started
+        <div className="mt-7 space-y-2.5">
+          <Link href="/register" className="btn-primary w-full py-3 text-sm">
+            Create account
+            <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link
-            href="/login"
-            className="px-8 py-4 rounded-xl border border-white/15 text-white/60 hover:text-white/90 hover:border-white/35 hover:scale-[1.02] active:scale-[0.97] text-base transition-all duration-200"
-          >
+          <Link href="/login" className="btn-ghost w-full py-3 text-sm">
             Sign in
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -16,7 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN mkdir -p /app/videos /app/skeleton_videos /app/models
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# CPU-only torch first: mediapipe depends on torch, and the default wheel pulls in ~3 GB of CUDA libs
+RUN pip install --no-cache-dir --timeout 120 --retries 10 torch opencv-contrib-python==4.9.0.80 --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple \
+    && pip install --no-cache-dir --timeout 120 --retries 10 -r requirements.txt
 
 COPY . .
 

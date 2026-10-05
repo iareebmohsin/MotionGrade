@@ -21,12 +21,9 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   if (!ready) return null;
 
   return (
-    <div className="min-h-screen bg-[#070b0f]">
-      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_45%_at_50%_-10%,rgba(34,197,94,0.12),transparent)]" />
+    <div className="relative z-10 min-h-screen">
       <Navbar />
-      <div className="pt-[72px]">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }

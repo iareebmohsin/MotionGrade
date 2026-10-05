@@ -1,58 +1,36 @@
 import { Check, AlertTriangle, X } from "lucide-react";
 import type { FeedbackItem, FeedbackStatus } from "@/types/analysis";
 
-const STATUS_CONFIG: Record<
+const STATUS: Record<
   FeedbackStatus,
-  {
-    Icon: React.ComponentType<{ className?: string }>;
-    className: string;
-  }
+  { Icon: React.ComponentType<{ className?: string }>; bar: string; icon: string }
 > = {
-  ok: {
-    Icon: Check,
-    className: "text-green-400 bg-green-500/[0.08] border-green-500/25",
-  },
-  warning: {
-    Icon: AlertTriangle,
-    className: "text-yellow-400 bg-yellow-500/[0.08] border-yellow-500/25",
-  },
-  error: {
-    Icon: X,
-    className: "text-red-400 bg-red-500/[0.08] border-red-500/25",
-  },
+  ok: { Icon: Check, bar: "bg-emerald-400", icon: "text-emerald-400" },
+  warning: { Icon: AlertTriangle, bar: "bg-amber-400", icon: "text-amber-400" },
+  error: { Icon: X, bar: "bg-rose-400", icon: "text-rose-400" },
 };
 
-export function FeedbackList({
-  items,
-  baseDelay = 0,
-}: {
-  items: FeedbackItem[];
-  baseDelay?: number;
-}) {
+export function FeedbackList({ items, baseDelay = 0 }: { items: FeedbackItem[]; baseDelay?: number }) {
   return (
-    <div className="space-y-3">
+    <ul className="space-y-2">
       {items.map((item, i) => {
-        const config = STATUS_CONFIG[item.status as FeedbackStatus];
-        const { Icon } = config;
+        const s = STATUS[item.status as FeedbackStatus];
+        const { Icon } = s;
         return (
-          <div
+          <li
             key={item.id}
-            className={`flex items-start gap-3 rounded-xl border px-4 py-3 animate-slide-up ${config.className}`}
-            style={{
-              animationDelay: `${baseDelay + i * 150}ms`,
-              animationFillMode: "both",
-            }}
+            className="flex items-start gap-3 rounded-lg bg-[#0d0d0d] border border-white/[0.06] px-4 py-3 animate-slide-up"
+            style={{ animationDelay: `${baseDelay + i * 150}ms`, animationFillMode: "both" }}
           >
-            <Icon className="w-5 h-5 shrink-0 mt-0.5" />
-            <div>
-              <div className="font-semibold capitalize text-white/85 text-base">
-                {item.aspect.replace(/_/g, " ")}
-              </div>
-              <div className="text-sm text-white/50 mt-0.5">{item.message}</div>
+            <span className={`w-1 self-stretch rounded-full shrink-0 ${s.bar}`} />
+            <Icon className={`w-4 h-4 shrink-0 mt-1 ${s.icon}`} />
+            <div className="min-w-0">
+              <p className="font-medium capitalize text-white/90 text-sm">{item.aspect.replace(/_/g, " ")}</p>
+              <p className="text-sm text-white/45 mt-0.5 leading-relaxed">{item.message}</p>
             </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }

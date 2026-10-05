@@ -1,5 +1,5 @@
-const KEY = "liftlens_token";
-const EMAIL_KEY = "liftlens_email";
+const KEY = "mg_session";
+const EMAIL_KEY = "mg_identity";
 
 export const getToken = (): string | null =>
   typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
